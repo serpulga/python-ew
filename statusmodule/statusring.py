@@ -40,10 +40,10 @@ class StatusRing(Ring):
 
     def module_read(self, **params):
         """
-	    Implementing base class method, simply
-	    calling the 'ring_read' function from
-	    the statusmodule module.
-	    """
+        Implementing base class method, simply
+        calling the 'ring_read' function from
+        the statusmodule module.
+        """
         params['sequence'] = str(self.sequence)
         raw_status = statusmodule.ring_read(**params)
         self.sequence += 1

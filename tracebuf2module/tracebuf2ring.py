@@ -32,94 +32,94 @@ class Tracebuf2Ring(Ring):
     """
     Class for Reading/Writing Tracebuf2 messages from/into a ring.
     """
-	def __init__(self, ring_name, module_id):
-		Ring.__init__(self, ring_name, module_id, Tracebuf2Message)
+    def __init__(self, ring_name, module_id):
+	    Ring.__init__(self, ring_name, module_id, Tracebuf2Message)
 
-	def module_write(self, **args):
-	    """
-	    Implementing base class method, simply
-	    calling the 'ring_write' function from
-	    the tracebuf2module module.
-	    """
-		return tracebuf2module.ring_write(**args)
+    def module_write(self, **args):
+        """
+        Implementing base class method, simply
+        calling the 'ring_write' function from
+        the tracebuf2module module.
+        """
+	    return tracebuf2module.ring_write(**args)
 
-	def module_read(self, **params):
-	    """
-	    Implementing base class method, simply
-	    calling the 'ring_read' function from
-	    the tracebuf2module module.
-	    """
-		return tracebuf2module.ring_read(**params)
+    def module_read(self, **params):
+        """
+        Implementing base class method, simply
+        calling the 'ring_read' function from
+        the tracebuf2module module.
+        """
+	    return tracebuf2module.ring_read(**params)
 
 class Tracebuf2Message():
-	def __init__(self, pinno, nsamp, starttime, endtime,
-				samprate, sta, net, chan, loc,
-				version, datatype, quality, pad, samples):
-		
-		self.pinno = pinno
-		self.nsamp = nsamp
-		self.starttime = starttime
-		self.endtime = endtime
-		self.samprate = samprate
-		self.sta = sta
-		self.net = net
-		self.chan = chan
-		self.loc = loc
-		self.version = version
-		self.datatype = datatype
-		self.quality = quality
-		self.pad = pad
-		self.samples = samples
-		
-	def __str__(self):
-		return str(Tracebuf2Message.toDict(self))
-		
-	__repr__ = __str__		
+    def __init__(self, pinno, nsamp, starttime, endtime,
+			    samprate, sta, net, chan, loc,
+			    version, datatype, quality, pad, samples):
 	
-	@staticmethod	
-	def toDict(trace_message):
-		trace_dict = {}
-		
-		trace_dict['pinno'] = trace_message.pinno
-		trace_dict['nsamp'] = trace_message.nsamp
-		trace_dict['starttime'] = trace_message.starttime
-		trace_dict['endtime'] = trace_message.endtime
-		trace_dict['samprate'] = trace_message.samprate
-		trace_dict['sta'] = trace_message.sta
-		trace_dict['net'] = trace_message.net
-		trace_dict['chan'] = trace_message.chan
-		trace_dict['loc'] = trace_message.loc
-		trace_dict['version'] = trace_message.version
-		trace_dict['datatype'] = trace_message.datatype
-		trace_dict['quality'] = trace_message.quality
-		trace_dict['pad'] = trace_message.pad
-		trace_dict['samples'] = trace_message.samples
+	    self.pinno = pinno
+	    self.nsamp = nsamp
+	    self.starttime = starttime
+	    self.endtime = endtime
+	    self.samprate = samprate
+	    self.sta = sta
+	    self.net = net
+	    self.chan = chan
+	    self.loc = loc
+	    self.version = version
+	    self.datatype = datatype
+	    self.quality = quality
+	    self.pad = pad
+	    self.samples = samples
+	
+    def __str__(self):
+	    return str(Tracebuf2Message.toDict(self))
+	
+    __repr__ = __str__		
 
-		return trace_dict
+    @staticmethod	
+    def toDict(trace_message):
+	    trace_dict = {}
+	
+	    trace_dict['pinno'] = trace_message.pinno
+	    trace_dict['nsamp'] = trace_message.nsamp
+	    trace_dict['starttime'] = trace_message.starttime
+	    trace_dict['endtime'] = trace_message.endtime
+	    trace_dict['samprate'] = trace_message.samprate
+	    trace_dict['sta'] = trace_message.sta
+	    trace_dict['net'] = trace_message.net
+	    trace_dict['chan'] = trace_message.chan
+	    trace_dict['loc'] = trace_message.loc
+	    trace_dict['version'] = trace_message.version
+	    trace_dict['datatype'] = trace_message.datatype
+	    trace_dict['quality'] = trace_message.quality
+	    trace_dict['pad'] = trace_message.pad
+	    trace_dict['samples'] = trace_message.samples
 
-	@staticmethod
-	def fromDict(trace_dict):
-		try:		
-			pinno = trace_dict.get('pinno')
-			nsamp = trace_dict.get('nsamp')
-			starttime = trace_dict.get('starttime')
-			endtime = trace_dict.get('endtime')
-			samprate = trace_dict.get('samprate')
-			sta = trace_dict.get('sta')
-			net = trace_dict.get('net')
-			chan = trace_dict.get('chan')
-			loc = trace_dict.get('loc')
-			version = trace_dict.get('version')
-			datatype = trace_dict.get('datatype')
-			quality = trace_dict.get('quality')
-			pad = trace_dict.get('pad')
-			samples = trace_dict.get('samples')
+	    return trace_dict
 
-			return Tracebuf2Message(pinno, nsamp, starttime, endtime,
-									samprate, sta, net, chan, loc,
-									version, datatype, quality, pad, samples) 
+    @staticmethod
+    def fromDict(trace_dict):
+	    try:		
+		    pinno = trace_dict.get('pinno')
+		    nsamp = trace_dict.get('nsamp')
+		    starttime = trace_dict.get('starttime')
+		    endtime = trace_dict.get('endtime')
+		    samprate = trace_dict.get('samprate')
+		    sta = trace_dict.get('sta')
+		    net = trace_dict.get('net')
+		    chan = trace_dict.get('chan')
+		    loc = trace_dict.get('loc')
+		    version = trace_dict.get('version')
+		    datatype = trace_dict.get('datatype')
+		    quality = trace_dict.get('quality')
+		    pad = trace_dict.get('pad')
+		    samples = trace_dict.get('samples')
 
-		except KeyError:
-			print 'Invalid dictionary.'
-			return None
+		    return Tracebuf2Message(pinno, nsamp, starttime, endtime,
+								    samprate, sta, net, chan, loc,
+								    version, datatype, quality, pad, samples) 
+
+	    except KeyError:
+		    print 'Invalid dictionary.'
+		    return None
 

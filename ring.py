@@ -24,80 +24,78 @@ class Ring():
     Ring class defines a generic interface tha will be extended 
     to use with each specific type.
     """
-	def __init__(self, ring_name, module_id, data_type):
-		self.module_id = module_id
-		self.ring = ring_name
-		self.sequence = 0
-		self.data_type = data_type
+    def __init__(self, ring_name, module_id, data_type):
+        self.module_id = module_id
+        self.ring = ring_name
+        self.sequence = 0
+        self.data_type = data_type
 
-	def module_write(self):
-		raise TypeError("Method not implemented in base class.")
+    def module_write(self):
+        raise TypeError("Method not implemented in base class.")
 
-	def module_read(self):
-		raise TypeError("Method not implemented in base class.")
+    def module_read(self):
+        raise TypeError("Method not implemented in base class.")
 
-	def write(self, data):
-	    """
-	    Write interface method. Creates the needed parameters
-	    dict and writes the data into the ring.
-	    """
-		data_dict = self.data_type.toDict(data)
-		args = self.completeWriteDict(data_dict)
-		
-		try:
-			print self.module_write(**args)
-			self.sequence += 1
-			return 0, args
+    def write(self, data):
+        """
+        Write interface method. Creates the needed parameters
+        dict and writes the data into the ring.
+        """
+        data_dict = self.data_type.toDict(data)
+        args = self.completeWriteDict(data_dict)
 
-		except Exception, err:
-			print 'Caught exception %s' % str(err)
-			print "Unexpected error:", sys.exc_info()[0]
-			return 1, args
+        try:
+	        self.module_write(**args)
+	        self.sequence += 1
+	        return 0, args
 
-	def read(self):
-	    """
-	    Read interface method. Creates the needed parameters
-	    dict and reads from the ring.
-	    """
-		try:
-			params = self.createReadDict()
-			data = self.module_read(**params)
+        except Exception, err:
+	        print 'Caught exception %s' % str(err)
+	        print "Unexpected error:", sys.exc_info()[0]
+	        return 1, args
 
-			data_list = []
+    def read(self):
+        """
+        Read interface method. Creates the needed parameters
+        dict and reads from the ring.
+        """
+        try:
+	        params = self.createReadDict()
+	        data = self.module_read(**params)
 
-			print data
-			
-			for item in data:
-				data_list.append(self.data_type.fromDict(item))
-				
-			return data_list, params
-
-		except Exception, err:
-			print 'Caught exception %s' % str(err)
-			print "Unexpected error:", sys.exc_info()[0]
-			return [], params
-
-	def completeWriteDict(self, data_dict):
-	    """
-	    Completes 'data_dict' including the parameters 
-	    needed for a write operation.
-	    """
-		data_dict['ring'] = self.ring
-		data_dict['module'] = self.module_id
-		data_dict['sequence'] = str(self.sequence)
-
-		return data_dict
-
-	def createReadDict(self):
-	    """
-	    Creates a dict including the parameters 
-	    needed for a write operation.
-	    """
-		read_dict = {}
-
-		read_dict['ring'] = self.ring
-		read_dict['module'] = self.module_id
-		
-		return read_dict
+	        data_list = []
 	
+	        for item in data:
+		        data_list.append(self.data_type.fromDict(item))
+		
+	        return data_list, params
+
+        except Exception, err:
+	        print 'Caught exception %s' % str(err)
+	        print "Unexpected error:", sys.exc_info()[0]
+	        return [], params
+
+    def completeWriteDict(self, data_dict):
+        """
+        Completes 'data_dict' including the parameters 
+        needed for a write operation.
+        """
+        data_dict['ring'] = self.ring
+        data_dict['module'] = self.module_id
+        data_dict['sequence'] = str(self.sequence)
+
+        return data_dict
+
+    def createReadDict(self):
+        """
+        Creates a dict including the parameters 
+        needed for a write operation.
+        """
+        read_dict = {}
+
+        read_dict['ring'] = self.ring
+        read_dict['module'] = self.module_id
+
+        return read_dict
+
 
