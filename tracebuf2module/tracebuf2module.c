@@ -35,13 +35,15 @@ static PyObject * ring_write(PyObject * self, PyObject * args, PyObject *kws)
 	double starttime, endtime, samprate;
 	char  * sta, * net, * chan, * loc;
     char * version, * datatype, * quality, * pad, * ring, * module, * sequence;
-	char  *keywords[] = {"pinno", "nsamp", "starttime", "endtime", "samprate", "sta", "net", "chan", 
-						"loc", "version", "datatype", "quality", "pad", "samples", "ring", "module", "sequence", NULL};
+	char  *keywords[] = {"pinno", "nsamp", "starttime", "endtime", "samprate",
+                         "sta", "net", "chan", "loc", "version", "datatype", 
+                         "quality", "pad", "samples", "ring", "module", "sequence", NULL};
 	int parsed;
 
-	parsed = PyArg_ParseTupleAndKeywords(args, kws, "iidddssssssssOsss", keywords, &pinno, &nsamp, &starttime,
-										&endtime, &samprate, &sta, &net, &chan, &loc, &version,
-										&datatype, &quality, &pad, &sample_list, &ring, &module, &sequence);	
+	parsed = PyArg_ParseTupleAndKeywords(args, kws, "iidddssssssssOsss", keywords, &pinno, 
+                                         &nsamp, &starttime, &endtime, &samprate, &sta, &net,
+                                         &chan, &loc, &version, &datatype, &quality, &pad,
+                                         &sample_list, &ring, &module, &sequence);	
 
 	if (!parsed) {
 		printf("Tracebuf2: Wrong args! \n");
@@ -125,11 +127,12 @@ static PyObject * ring_read(PyObject * self, PyObject * args, PyObject *kws)
         trace_data = (TRACE2_HEADER *) raw_data[i];
 
 	    trace = Py_BuildValue("{s:i,s:i,s:d,s:d,s:d,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s}",
-					   	"pinno", trace_data->pinno, "nsamp", trace_data->nsamp, "starttime", trace_data->starttime,
-					   	"endtime", trace_data->endtime, "samprate", trace_data->samprate, "sta", trace_data->sta, 
-						"net", trace_data->net, "chan", trace_data->chan, "loc", trace_data->loc,
-						"version", trace_data->version, "datatype", trace_data->datatype, "quality", trace_data->quality, 
-						"pad", trace_data->pad);
+					   	      "pinno", trace_data->pinno, "nsamp", trace_data->nsamp, 
+                              "starttime", trace_data->starttime, "endtime", trace_data->endtime,
+                              "samprate", trace_data->samprate, "sta", trace_data->sta, 
+						      "net", trace_data->net, "chan", trace_data->chan, "loc", trace_data->loc,
+						      "version", trace_data->version, "datatype", trace_data->datatype, 
+                              "quality", trace_data->quality, "pad", trace_data->pad);
 
 		int * long_data = (int *)(raw_data[i] + sizeof(TRACE2_HEADER));
     	short * short_data = (short *)(raw_data[i] + sizeof(TRACE2_HEADER));

@@ -21,78 +21,73 @@
 
 int write_ring(char * raw_data, char ** params, int max_length)
 {  
-	SHM_INFO region1;           /* main shared memory region         */
-	long ringkey;               /* key to transport ring             */
-	MSG_LOGO logo;              /* array of module,type,instid       */
-	static char * msg;          /* message from file                 */
-	int nread;                  /* number of bytes read from file    */
-	long sequence;              /* opt sequence# read from arguments */
-	unsigned char seq = 0;      /* sequence# to use in tport_copyto  */
-	char * ring_name;
-	char * data_type;
-	char * module_id;
-	char * sequence_array;
+    SHM_INFO region1;           /* main shared memory region         */
+    long ringkey;               /* key to transport ring             */
+    MSG_LOGO logo;              /* array of module,type,instid       */
+    static char * msg;          /* message from file                 */
+    int nread;                  /* number of bytes read from file    */
+    long sequence;              /* opt sequence# read from arguments */
+    unsigned char seq = 0;      /* sequence# to use in tport_copyto  */
+    char * ring_name;
+    char * data_type;
+    char * module_id;
+    char * sequence_array;
 
-	ring_name = params[0];
-	data_type = params[1];
-	module_id = params[2];
-	sequence_array = params[3];
+    ring_name = params[0];
+    data_type = params[1];
+    module_id = params[2];
+    sequence_array = params[3];
 
-	msg = (char *) malloc(max_length);
-	
-	int i;
-	for (i = 0; i < max_length; i++) {
-		msg[i] = raw_data[i];
-	}
+    msg = (char *) malloc(max_length);
+
+    int i;
+    for (i = 0; i < max_length; i++)
+        msg[i] = raw_data[i];
 
 /* Look up info from earthworm.h tables
    ************************************/
-   if((ringkey = GetKey(ring_name)) == -1) {
-        printf("Invalid ring name: %s; exiting!\n",
-                 ring_name);
+    if((ringkey = GetKey(ring_name)) == -1) {
+        printf("Invalid ring name: %s; exiting!\n", ring_name);
         return(-1);
-   }
-   if (GetLocalInst(&logo.instid) != 0) {
-      printf("Invalid local installation; exiting!\n");
-      return(-1);
-   }
-   if (GetModId(module_id, &logo.mod) != 0) {
-      printf("Invalid module name: %s; exiting!\n",
-               module_id);
-      return(-1);
-   }
+    }
+    if (GetLocalInst(&logo.instid) != 0) {
+        printf("Invalid local installation; exiting!\n");
+        return(-1);
+    }
+    if (GetModId(module_id, &logo.mod) != 0) {
+        printf("Invalid module name: %s; exiting!\n", module_id);
+        return(-1);
+    }
 
-   if (GetType(data_type, &logo.type) != 0) {
-      printf("Invalid message type: %s; exiting!\n",
-               data_type);
-      return(-1);
-   }
+    if (GetType(data_type, &logo.type) != 0) {
+        printf("Invalid message type: %s; exiting!\n", data_type);
+        return(-1);
+    }
 
 /* Read sequence argument if it exists
  *************************************/ 
 
-	sequence = atol(sequence_array);
-	if(sequence < 0)
-	{
-	 printf("Invalid sequence# <%ld>, must be positive;"
-		     " exiting!\n", sequence);
-	 return(-1);
-	}
-	seq = sequence % 256;
+    sequence = atol(sequence_array);
+    if(sequence < 0) {
+        printf("Invalid sequence# <%ld>, must be positive; exiting!\n", sequence);
+        return(-1);
+    }
+
+    seq = sequence % 256;
 
 
 /* Send archive message to transport ring
  ****************************************/
-   tport_attach(&region1, ringkey);
+    tport_attach(&region1, ringkey);
 
-   if(tport_copyto(&region1, &logo, max_length, msg, seq) != PUT_OK) {
-       printf("Error writing message: %s to transport ring.\n", msg);
-	   return (-1);
-   }
+    if(tport_copyto(&region1, &logo, max_length, msg, seq) != PUT_OK) {
+        printf("Error writing message: %s to transport ring.\n", msg);
+        return (-1);
+    }
 
-   tport_detach(&region1);
+    tport_detach(&region1);
 
-   return(0);
+    return(0);
 }
 
 
