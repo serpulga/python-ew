@@ -31,10 +31,10 @@ class Ring():
         self.data_type = data_type
 
     def module_write(self):
-        raise TypeError("Method not implemented in base class.")
+        raise NotImplementedError("Method not implemented in base class.")
 
     def module_read(self):
-        raise TypeError("Method not implemented in base class.")
+        raise NotImplementedError("Method not implemented in base class.")
 
     def write(self, data):
         """
