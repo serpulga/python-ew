@@ -28,17 +28,17 @@
 
 static PyObject * ring_read(PyObject * self, PyObject * args, PyObject *kws)
 {	
-	char * ring, * module, *sequence;
-	char *keywords[] = {"ring", "module", "sequence", NULL};
+    char * ring, * module, *sequence;
+    char *keywords[] = {"ring", "module", "sequence", NULL};
 
-	if (!PyArg_ParseTupleAndKeywords(args, kws, "sss", keywords, &ring, &module, &sequence)) {
-		printf("Status: Wrong parameters! \n");
-		return NULL;		
-	}
+    if (!PyArg_ParseTupleAndKeywords(args, kws, "sss", keywords, &ring, &module, &sequence)) {
+    printf("Status: Wrong parameters! \n");
+    return NULL;		
+    }
 
-	unsigned char items = 0;
-	char *params[] = {ring, "TYPE_STATUS", module};
-	char *raw_data[1000];
+    unsigned char items = 0;
+    char *params[] = {ring, "TYPE_STATUS", module};
+    char *raw_data[1000];
     char *write_params[] = {ring, "TYPE_REQSTATUS", module, sequence};
 
     // Request status before reading.
@@ -46,18 +46,18 @@ static PyObject * ring_read(PyObject * self, PyObject * args, PyObject *kws)
     
     sleep(10);
 
-	items = read_ring(params, MAX_BYTES_STATUS, raw_data);
+    items = read_ring(params, MAX_BYTES_STATUS, raw_data);
 
-	if (items > 0)
-		return Py_BuildValue("s", raw_data[0]);
+    if (items > 0)
+    return Py_BuildValue("s", raw_data[0]);
 
-	else 
-        return NULL;
+    else 
+    return NULL;
 }
 
 static PyMethodDef StatusMethods[] = {
-	{"ring_read", (void*)ring_read, METH_VARARGS | METH_KEYWORDS, "Reads TYPE_STATUS messages from the ring."},
-	{NULL, NULL, (void*)0, NULL}
+    {"ring_read", (void*)ring_read, METH_VARARGS | METH_KEYWORDS, "Reads TYPE_STATUS messages from the ring."},
+    {NULL, NULL, (void*)0, NULL}
 };
 
 PyMODINIT_FUNC

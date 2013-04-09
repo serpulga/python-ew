@@ -1,20 +1,20 @@
-    """
-    Generic python ring interface for Earthworm 
-    Copyright (C) 2013, OSOP SA Panama
+"""
+Generic python ring interface for Earthworm 
+Copyright (C) 2013, OSOP SA Panama
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-    """
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
 
 import os
@@ -49,12 +49,12 @@ class Ring():
         try:
             self.module_write(**args)
             self.sequence += 1
-            return 0, args
+            return True
 
         except Exception, err:
             print 'Caught exception %s' % str(err)
             print "Unexpected error:", sys.exc_info()[0]
-            return 1, args
+            return False
 
     def read(self):
         """
@@ -70,12 +70,12 @@ class Ring():
             for item in data:
                 data_list.append(self.data_type.fromDict(item))
         
-            return data_list, params
+            return data_list
 
         except Exception, err:
             print 'Caught exception %s' % str(err)
             print "Unexpected error:", sys.exc_info()[0]
-            return [], params
+            return []
 
     def completeWriteDict(self, data_dict):
         """

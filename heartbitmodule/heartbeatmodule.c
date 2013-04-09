@@ -25,28 +25,26 @@
 static PyObject * ring_write(PyObject * self, PyObject * args, PyObject *kws)
 {
     char * unix_time, * ring, * module, * sequence;
-	char *keywords[] = {"unix_time", "ring", "module", "sequence", NULL};
-	int parsed;
+    char *keywords[] = {"unix_time", "ring", "module", "sequence", NULL};
+    int parsed;
 
-	parsed = PyArg_ParseTupleAndKeywords(args, kws, "ssss", keywords, &unix_time, &ring, &module, &sequence);
-	if (!parsed) {
-		printf("HeartBeat: Wrong parameters! \n");
-		return NULL;		
-	}
+    parsed = PyArg_ParseTupleAndKeywords(args, kws, "ssss", keywords, &unix_time, &ring, &module, &sequence);
+    if (!parsed) {
+	    printf("HeartBeat: Wrong parameters! \n");
+	    return NULL;		
+    }
 
-	else {
-	    char * raw_data;
-		char *params[] = {ring, "TYPE_HEARTBEAT", module, sequence};
+    else {
+        char * raw_data;
+	    char *params[] = {ring, "TYPE_HEARTBEAT", module, sequence};
 
-		write_ring(unix_time, params, strlen(unix_time));
-	}
-
-	return Py_BuildValue("s", "Ok!");
+	    write_ring(unix_time, params, strlen(unix_time));
+    }
 }
 
 static PyMethodDef HeartBeatMethods[] = {
-	{"ring_write", (void*)ring_write, METH_VARARGS | METH_KEYWORDS, "Writes a TYPE_HEARTBEAT message into the a ring."},
-	{NULL, NULL, (void*)0, NULL}
+    {"ring_write", (void*)ring_write, METH_VARARGS | METH_KEYWORDS, "Writes a TYPE_HEARTBEAT message into the a ring."},
+    {NULL, NULL, (void*)0, NULL}
 };
 
 PyMODINIT_FUNC
