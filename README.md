@@ -37,5 +37,5 @@ Example:
 
     ```python trace_setup.py build```
 
-This will create a dynamically linked library corresponding of the module, and it's the one
+This will create a dynamically linked library corresponding to the module, and it's the one
 that the python module will try to load.
