@@ -16,8 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     """
 
+
 import os
 import sys
+
 
 class Ring():
     """
@@ -45,14 +47,14 @@ class Ring():
         args = self.completeWriteDict(data_dict)
 
         try:
-	        self.module_write(**args)
-	        self.sequence += 1
-	        return 0, args
+            self.module_write(**args)
+            self.sequence += 1
+            return 0, args
 
         except Exception, err:
-	        print 'Caught exception %s' % str(err)
-	        print "Unexpected error:", sys.exc_info()[0]
-	        return 1, args
+            print 'Caught exception %s' % str(err)
+            print "Unexpected error:", sys.exc_info()[0]
+            return 1, args
 
     def read(self):
         """
@@ -60,20 +62,20 @@ class Ring():
         dict and reads from the ring.
         """
         try:
-	        params = self.createReadDict()
-	        data = self.module_read(**params)
+            params = self.createReadDict()
+            data = self.module_read(**params)
 
-	        data_list = []
-	
-	        for item in data:
-		        data_list.append(self.data_type.fromDict(item))
-		
-	        return data_list, params
+            data_list = []
+    
+            for item in data:
+                data_list.append(self.data_type.fromDict(item))
+        
+            return data_list, params
 
         except Exception, err:
-	        print 'Caught exception %s' % str(err)
-	        print "Unexpected error:", sys.exc_info()[0]
-	        return [], params
+            print 'Caught exception %s' % str(err)
+            print "Unexpected error:", sys.exc_info()[0]
+            return [], params
 
     def completeWriteDict(self, data_dict):
         """
@@ -97,5 +99,4 @@ class Ring():
         read_dict['module'] = self.module_id
 
         return read_dict
-
 

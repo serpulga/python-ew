@@ -17,8 +17,9 @@
     """
    
 import os
-import statusmodule
 import re
+
+import statusmodule
 
 # ring.py must on parent folder,
 # Adding parent folder to the path.
@@ -108,4 +109,3 @@ class StatusMessage():
     @staticmethod
     def toDict(status_message):
         return status_message.status_dict
-

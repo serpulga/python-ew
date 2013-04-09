@@ -17,8 +17,9 @@
     """
     
 import os
-import heartbeatmodule
 import datetime
+
+import heartbeatmodule
 
 # ring.py must on parent folder,
 # Adding parent folder to the path.
@@ -39,7 +40,7 @@ class HeartBeatRing(Ring):
         calling the 'ring_write' function from
         the tracebuf2module module.
         """
-	    return tracebuf2module.ring_write(**args)
+        return tracebuf2module.ring_write(**args)
 
     def module_read(self, **params):
         raise TypeError('Reading heartbeat type messages is not supported.')
@@ -53,4 +54,3 @@ class HeartBeatRing(Ring):
         args['unix_time'] = str((datetime.datetime.utcnow() - datetime.datetime(1970, 1, 1)).total_seconds())
         self.sequence += 1
         return heartbeatmodule.ring_write(**args)
-
