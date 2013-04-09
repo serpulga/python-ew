@@ -1,9 +1,15 @@
 PythonEw
 =========
 
+By OSOP 
+
+http://www.osop.com.pa
+
+![OSOP LOGO](http://www.osop.com.pa/wp-content/uploads/2012/02/ss.png)
+
 Python wrapper for accessing an Earthworm shared memory ring.
 Earthworm is a set of opensource programs, tools and libraries that are used in the development of software for maintaining seismic networks, research and other seismological and geophysical applications. 
-http://folkworm.ceri.memphis.edu/ew-doc/
+http://vps.isti.com/trac/ew/
 
 The main objective of these wrapper-modules is to make it easier for people to contribute to the Earthworm project; developing Earthworm modules using these wrappers is truly a joy as it enables developers to have directy access to memory rings whilst enjoying all the functionality that *Python* itself brings to the table. Introducing *Python* into the Earthworm picture will allow new people to come in and contribute.
 
@@ -21,7 +27,7 @@ Tracebuf2
         tracebuf2ring.py
         trace_setup.py
 ```
-In order to use a module from *Python*, the *C* source, in this case ```tracebuf2module.c```, needs to be compiled into a dynamically link library that *Python* can load.
+In order to use a module from *Python*, the *C* source, in this case ```tracebuf2module.c```, needs to be compiled into a dynamically linked library that *Python* can load.
 
 **HOW TO INSTALL**
 
