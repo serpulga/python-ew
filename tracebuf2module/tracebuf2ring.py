@@ -17,8 +17,10 @@
     """
 
 import os
-import tracebuf2module
 import sys
+
+import tracebuf2module
+
 
 # ring.py must on parent folder,
 # Adding parent folder to the path.
