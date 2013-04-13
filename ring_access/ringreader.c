@@ -22,7 +22,7 @@
 
 #include "ringreader.h"
 
-int read_ring(char ** params, int max_lenth, char ** raw_data)
+char** read_ring(char ** params, int max_lenth, int max_items, int * nread)
 {
     long RingKey;
     SHM_INFO region;
@@ -35,8 +35,10 @@ int read_ring(char ** params, int max_lenth, char ** raw_data)
     char * ring_name;
     char * data_type;
     char * module_id;
+    char ** raw_data = NULL;
 
-    ring_name = params[0];
+    *nread = 0; 
+    ring_name = params[0]; 
     data_type = params[1];
     module_id = params[2];
 
@@ -45,29 +47,29 @@ int read_ring(char ** params, int max_lenth, char ** raw_data)
     if (RingKey == -1) 
     {
         fprintf(stderr, "Error getting ring; exiting!\n" );
-        return -1;
+        return NULL;
     }
 
     tport_attach(&region, RingKey);
 
     if (GetLocalInst(&instId) != 0) {
         fprintf(stderr, "Error getting local installation id; exiting!\n" );
-        return -1;
+        return NULL;
     }
 
     if (GetType(data_type, &type) != 0) {
         fprintf(stderr, "Error getting message type; exiting!\n" );
-        return -1;
+        return NULL;
     }
 
     if (GetModId(module_id, &ModWildcard) != 0) {
         fprintf(stderr, "Invalid mod id; exiting!\n" );
-        return -1;		
+        return NULL;		
     }
 
     if (GetInst("INST_WILDCARD", &InstWildcard) != 0) {
         fprintf(stderr, "Invalid installation; exiting!\n" );
-        return -1;
+        return NULL;
     }
 
     getlogo[0].type = type;
@@ -80,29 +82,38 @@ int read_ring(char ** params, int max_lenth, char ** raw_data)
     int i = 0;
     int k;
     int j;
-    for(k = 0; k < 1000; k++) {
-        if (tport_getflag(&region) == TERMINATE)
+    while(1) {
+        if ((tport_getflag(&region) == TERMINATE) || (max_items > 0 && i >= max_items))
             break;
 
         rc = tport_copyfrom(&region, getlogo, 1, &logo, &gotsize, (char *) &msg, max_lenth, &sequence_number);
-
+        
+        /* Don't read undefinitely */
         if (rc == GET_NONE)
-            continue;
-
+            break;
 
         if (logo.type == type) {
-            raw_data[i] = (char *) malloc(max_lenth * sizeof(char));
+            char * read_data = (char *) malloc(max_lenth * sizeof(char));  
+            char ** new_ptr = (char **) realloc(raw_data, (i + 1) * sizeof(char*));
+            
+            if (new_ptr == NULL)
+                break;
+                
+            else 
+                raw_data = new_ptr;
 
+            raw_data[i] = read_data;
             for (j = 0; j < max_lenth; j++)		
 	            raw_data[i][j] = msg[j];
 
             fflush (stdout);
             i++;
+            *nread = i;
         }
     }
 
     tport_detach(&region);
 
-    return i;
+    return raw_data;
 }
 

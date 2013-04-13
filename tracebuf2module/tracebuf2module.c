@@ -111,14 +111,16 @@ static PyObject * ring_read(PyObject * self, PyObject * args, PyObject * kws)
 	    return PyList_New(0);		
     }
 
-    unsigned char items = 0;
     char *params[] = {ring, "TYPE_TRACEBUF2", module};
-    char *raw_data[1000];
+    char ** raw_data = NULL;
+    int items = 0;
     PyObject * trace_list;
 
-    items = read_ring(params, MAX_TRACEBUF_SIZ, raw_data);
+    printf("Will read now\n");
+    raw_data = read_ring(params, MAX_TRACEBUF_SIZ, 1000, &items);
     trace_list = PyList_New(items);
-
+    printf("Read %d\n", items);
+    
     int i;
     int k;
     for (i = 0; i < items; i++) {
@@ -133,8 +135,8 @@ static PyObject * ring_read(PyObject * self, PyObject * args, PyObject * kws)
         char version[3];
         char quality[3];
         
-        strncpy(&version, trace_data->version, 2);
-        strncpy(&quality, trace_data->quality, 2);
+        strncpy((char *) &version[0], trace_data->version, 2);
+        strncpy((char *) &quality[0], trace_data->quality, 2);
         
         version[2] = '\0';
         quality[2] = '\0';
