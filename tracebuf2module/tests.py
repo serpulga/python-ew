@@ -1,7 +1,7 @@
 """
 Testing module for tracebuf2 functionality.
 Currently only works for Rings with no previous
-TRACEBUF2_TYPE data in it.
+TRACEBUF2_TYPE data on them.
 """
 
 import unittest
