@@ -32,8 +32,8 @@ static PyObject * ring_read(PyObject * self, PyObject * args, PyObject *kws)
     char *keywords[] = {"ring", "module", "sequence", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kws, "sss", keywords, &ring, &module, &sequence)) {
-    printf("Status: Wrong parameters! \n");
-    return NULL;		
+        printf("Status: Wrong parameters! \n");
+        return Py_BuildValue("");		
     }
 
     unsigned char items = 0;
@@ -49,10 +49,10 @@ static PyObject * ring_read(PyObject * self, PyObject * args, PyObject *kws)
     items = read_ring(params, MAX_BYTES_STATUS, raw_data);
 
     if (items > 0)
-    return Py_BuildValue("s", raw_data[0]);
+        return Py_BuildValue("s", raw_data[0]);
 
     else 
-    return NULL;
+        return Py_BuildValue("");
 }
 
 static PyMethodDef StatusMethods[] = {

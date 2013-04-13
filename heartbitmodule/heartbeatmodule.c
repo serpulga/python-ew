@@ -31,7 +31,6 @@ static PyObject * ring_write(PyObject * self, PyObject * args, PyObject *kws)
     parsed = PyArg_ParseTupleAndKeywords(args, kws, "ssss", keywords, &unix_time, &ring, &module, &sequence);
     if (!parsed) {
 	    printf("HeartBeat: Wrong parameters! \n");
-	    return NULL;		
     }
 
     else {
@@ -40,6 +39,8 @@ static PyObject * ring_write(PyObject * self, PyObject * args, PyObject *kws)
 
 	    write_ring(unix_time, params, strlen(unix_time));
     }
+
+    return Py_BuildValue("");
 }
 
 static PyMethodDef HeartBeatMethods[] = {

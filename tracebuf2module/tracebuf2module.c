@@ -47,14 +47,14 @@ static PyObject * ring_write(PyObject * self, PyObject * args, PyObject * kws)
 
     if (!parsed) {
 	    printf("Tracebuf2: Wrong args! \n");
-	    return NULL;		
+	    return Py_BuildValue("");		
     }
 
     else {
         int tracesize = sizeof(TRACE2_HEADER) + (sizeof(int) * nsamp); 
         if (tracesize > MAX_TRACEBUF_SIZ) {
             printf("Tracebuf2: Message too long! \n");
-            return NULL;
+            return Py_BuildValue("");
 	    }
 
 	    int i;
@@ -84,10 +84,10 @@ static PyObject * ring_write(PyObject * self, PyObject * args, PyObject * kws)
 	    strcpy(trace_header.net, net);
 	    strcpy(trace_header.chan, chan);
 	    strcpy(trace_header.loc, loc);
-	    strncpy(trace_header.version, version, 2);
 	    strcpy(trace_header.datatype, datatype);
+	    strncpy(trace_header.version, version, 2);
 	    strncpy(trace_header.quality, quality, 2);
-	    strncpy(trace_header.pad, pad, 1);
+	    strncpy(trace_header.pad, pad, 2);
 
 	    trace_data.header = trace_header;
 	    for (i = 0; i < sizeof(int) * nsamp; i++)
@@ -95,6 +95,9 @@ static PyObject * ring_write(PyObject * self, PyObject * args, PyObject * kws)
 
 	    raw_data = (char *) &trace_data;
 	    write_ring(raw_data, params, tracesize);
+        
+        return Py_BuildValue("");
+
     }
 }
 
@@ -105,7 +108,7 @@ static PyObject * ring_read(PyObject * self, PyObject * args, PyObject * kws)
 
     if (!PyArg_ParseTupleAndKeywords(args, kws, "ss", keywords, &ring, &module)) {
 	    printf("Tracebuf2: Wrong args! \n");
-	    return NULL;		
+	    return PyList_New(0);		
     }
 
     unsigned char items = 0;
@@ -125,13 +128,24 @@ static PyObject * ring_read(PyObject * self, PyObject * args, PyObject * kws)
 	    TRACE2_HEADER * trace_data;
         trace_data = (TRACE2_HEADER *) raw_data[i];
 
+        /* Let's Null terminate some strings to they are
+           are passed to Python correctly */
+        char version[3];
+        char quality[3];
+        
+        strncpy(&version, trace_data->version, 2);
+        strncpy(&quality, trace_data->quality, 2);
+        
+        version[2] = '\0';
+        quality[2] = '\0';
+        
         trace = Py_BuildValue("{s:i,s:i,s:d,s:d,s:d,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s}",
 			                  "pinno", trace_data->pinno, "nsamp", trace_data->nsamp, 
                               "starttime", trace_data->starttime, "endtime", trace_data->endtime,
                               "samprate", trace_data->samprate, "sta", trace_data->sta, 
 			                  "net", trace_data->net, "chan", trace_data->chan, "loc", trace_data->loc,
-			                  "version", trace_data->version, "datatype", trace_data->datatype, 
-                              "quality", trace_data->quality, "pad", trace_data->pad);
+			                  "version", version, "datatype", trace_data->datatype, 
+                              "quality", quality, "pad", trace_data->pad);
 
 	    int * long_data = (int *)(raw_data[i] + sizeof(TRACE2_HEADER));
     	short * short_data = (short *)(raw_data[i] + sizeof(TRACE2_HEADER));
@@ -143,7 +157,7 @@ static PyObject * ring_read(PyObject * self, PyObject * args, PyObject * kws)
             	PyList_SetItem(sample_list, k, Py_BuildValue("i", *(short_data + k)));
 	    }
 
-        else if ((strcmp (trace_data->datatype, "s4") == 0) || (strcmp(trace_data->datatype, "i4") == 0)) {
+        else if ((strcmp(trace_data->datatype, "s4") == 0) || (strcmp(trace_data->datatype, "i4") == 0)) {
         	for (k = 0; k < trace_data->nsamp; k++)
             	PyList_SetItem(sample_list, k, Py_BuildValue("i", *(long_data + k)));
 	    }
