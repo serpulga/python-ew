@@ -1,7 +1,11 @@
+import os
+
 from distutils.core import setup, Extension
 
-libs = '/path/to/ew/lib/'
-includes = '/path/to/ew/includes/'
+
+EW_HOME = os.getenv('EW_HOME') 
+libs = EW_HOME + '/lib/'
+includes = EW_HOME + '/includes/'
 
 module = Extension(name = 'statusmodule', 
                    sources = ['statusmodule.c'],
