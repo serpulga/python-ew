@@ -116,10 +116,8 @@ static PyObject * ring_read(PyObject * self, PyObject * args, PyObject * kws)
     int items = 0;
     PyObject * trace_list;
 
-    printf("Will read now\n");
     raw_data = read_ring(params, MAX_TRACEBUF_SIZ, 1000, &items);
     trace_list = PyList_New(items);
-    printf("Read %d\n", items);
     
     int i;
     int k;
@@ -167,7 +165,8 @@ static PyObject * ring_read(PyObject * self, PyObject * args, PyObject * kws)
 	    PyDict_SetItem(trace, Py_BuildValue("s", "samples"), sample_list);
 	    PyList_SetItem(trace_list, i, trace);
     }
-
+    
+    free(raw_data);
     return trace_list;
 }
 
