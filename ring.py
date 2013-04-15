@@ -56,14 +56,15 @@ class Ring():
             print "Unexpected error:", sys.exc_info()[0]
             return False
 
-    def read(self):
+    def read(self, *args, **kwargs):
         """
         Read interface method. Creates the needed parameters
         dict and reads from the ring.
         """
         try:
             params = self.createReadDict()
-            data = self.module_read(**params)
+            params.update(kwargs)
+            data = self.module_read(*args, **params)
 
             data_list = []
     
