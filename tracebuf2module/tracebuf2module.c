@@ -46,8 +46,8 @@ static PyObject * ring_write(PyObject * self, PyObject * args, PyObject * kws)
                                          &sample_list, &ring, &module, &sequence);	
 
     if (!parsed) {
-	    printf("Tracebuf2: Wrong args! \n");
-	    return Py_BuildValue("");		
+        printf("Tracebuf2: Wrong args! \n");
+        return Py_BuildValue("");		
     }
 
     else {
@@ -55,46 +55,46 @@ static PyObject * ring_write(PyObject * self, PyObject * args, PyObject * kws)
         if (tracesize > MAX_TRACEBUF_SIZ) {
             printf("Tracebuf2: Message too long! \n");
             return Py_BuildValue("");
-	    }
+        }
 
-	    int i;
-	    int samples_int[nsamp];
-	    char * samples;
-	    for (i = 0; i < nsamp; i++) {
-		    int sample;
+        int i;
+        int samples_int[nsamp];
+        char * samples;
+        for (i = 0; i < nsamp; i++) {
+            int sample;
 
-		    PyArg_Parse(PyList_GetItem(sample_list, i), "i", &sample);
-		    samples_int[i] = sample;
-	    }
+            PyArg_Parse(PyList_GetItem(sample_list, i), "i", &sample);
+            samples_int[i] = sample;
+        }
 
-	    samples = (char *) samples_int;	
-	
+        samples = (char *) samples_int;	
+    
         char * raw_data;
-	    char *params[] = {ring, "TYPE_TRACEBUF2", module, sequence};
-	    TRACE2_HEADER trace_header;
-	    TRACE2_HEADER_AND_SAMPS trace_data;
+        char *params[] = {ring, "TYPE_TRACEBUF2", module, sequence};
+        TRACE2_HEADER trace_header;
+        TRACE2_HEADER_AND_SAMPS trace_data;
 
-	    trace_header.pinno = pinno;
-	    trace_header.nsamp = nsamp;
-	    trace_header.starttime = starttime;
-	    trace_header.endtime = endtime;
-	    trace_header.samprate = samprate;
+        trace_header.pinno = pinno;
+        trace_header.nsamp = nsamp;
+        trace_header.starttime = starttime;
+        trace_header.endtime = endtime;
+        trace_header.samprate = samprate;
 
-	    strcpy(trace_header.sta, sta);
-	    strcpy(trace_header.net, net);
-	    strcpy(trace_header.chan, chan);
-	    strcpy(trace_header.loc, loc);
-	    strcpy(trace_header.datatype, datatype);
-	    strncpy(trace_header.version, version, 2);
-	    strncpy(trace_header.quality, quality, 2);
-	    strncpy(trace_header.pad, pad, 2);
+        strcpy(trace_header.sta, sta);
+        strcpy(trace_header.net, net);
+        strcpy(trace_header.chan, chan);
+        strcpy(trace_header.loc, loc);
+        strcpy(trace_header.datatype, datatype);
+        strncpy(trace_header.version, version, 2);
+        strncpy(trace_header.quality, quality, 2);
+        strncpy(trace_header.pad, pad, 2);
 
-	    trace_data.header = trace_header;
-	    for (i = 0; i < sizeof(int) * nsamp; i++)
-		    trace_data.samples[i] = samples[i];	
+        trace_data.header = trace_header;
+        for (i = 0; i < sizeof(int) * nsamp; i++)
+            trace_data.samples[i] = samples[i];	
 
-	    raw_data = (char *) &trace_data;
-	    write_ring(raw_data, params, tracesize);
+        raw_data = (char *) &trace_data;
+        write_ring(raw_data, params, tracesize);
         
         return Py_BuildValue("");
 
@@ -103,12 +103,15 @@ static PyObject * ring_write(PyObject * self, PyObject * args, PyObject * kws)
 
 static PyObject * ring_read(PyObject * self, PyObject * args, PyObject * kws)
 {	
-    char * ring, * module;
-    char *keywords[] = {"ring", "module", NULL};
+    int max_traces = -1;
+    char * ring;
+    char * module;
+    char * sta = NULL;
+    char *keywords[] = {"ring", "module", "max_traces", "sta", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kws, "ss", keywords, &ring, &module)) {
-	    printf("Tracebuf2: Wrong args! \n");
-	    return PyList_New(0);		
+    if (!PyArg_ParseTupleAndKeywords(args, kws, "ss|is", keywords, &ring, &module, &max_traces, &sta)) {
+        printf("Tracebuf2: Wrong args! \n");
+        return PyList_New(0);		
     }
 
     char *params[] = {ring, "TYPE_TRACEBUF2", module};
@@ -116,17 +119,32 @@ static PyObject * ring_read(PyObject * self, PyObject * args, PyObject * kws)
     int items = 0;
     PyObject * trace_list;
 
-    raw_data = read_ring(params, MAX_TRACEBUF_SIZ, 1000, &items);
-    trace_list = PyList_New(items);
+    raw_data = read_ring(params, MAX_TRACEBUF_SIZ, &items);
+    trace_list = PyList_New(0);
+    max_traces = max_traces == -1 ? items : max_traces;
     
-    int i;
     int k;
-    for (i = 0; i < items; i++) {
-        PyObject * sample_list;
-	    PyObject * trace;
+    int i = 0;
+    int inserted = 0;
 
-	    TRACE2_HEADER * trace_data;
+    /* i and items prevent accessing raw_data at a invalid
+       index; inserted and max_traces prevent returning more
+       items than asked */
+    while (inserted < max_traces && i < items) {
+        PyObject * sample_list;
+        PyObject * trace;
+
+        TRACE2_HEADER * trace_data;
         trace_data = (TRACE2_HEADER *) raw_data[i];
+
+        int * long_data = (int *)(raw_data[i] + sizeof(TRACE2_HEADER));
+        short * short_data = (short *)(raw_data[i] + sizeof(TRACE2_HEADER));
+
+        i++;
+        if (sta != NULL) {
+            if(strcmp(trace_data->sta, sta) != 0)
+                continue;
+        }
 
         /* Let's Null terminate some strings to they are
            are passed to Python correctly */
@@ -140,32 +158,29 @@ static PyObject * ring_read(PyObject * self, PyObject * args, PyObject * kws)
         quality[2] = '\0';
         
         trace = Py_BuildValue("{s:i,s:i,s:d,s:d,s:d,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s}",
-			                  "pinno", trace_data->pinno, "nsamp", trace_data->nsamp, 
+                              "pinno", trace_data->pinno, "nsamp", trace_data->nsamp, 
                               "starttime", trace_data->starttime, "endtime", trace_data->endtime,
                               "samprate", trace_data->samprate, "sta", trace_data->sta, 
-			                  "net", trace_data->net, "chan", trace_data->chan, "loc", trace_data->loc,
-			                  "version", version, "datatype", trace_data->datatype, 
+                              "net", trace_data->net, "chan", trace_data->chan, "loc", trace_data->loc,
+                              "version", version, "datatype", trace_data->datatype, 
                               "quality", quality, "pad", trace_data->pad);
 
-	    int * long_data = (int *)(raw_data[i] + sizeof(TRACE2_HEADER));
-    	short * short_data = (short *)(raw_data[i] + sizeof(TRACE2_HEADER));
+        sample_list = PyList_New(trace_data->nsamp);
 
-	    sample_list = PyList_New(trace_data->nsamp);
-
-	    if ((strcmp(trace_data->datatype, "s2") == 0) || (strcmp(trace_data->datatype, "i2") == 0)) {
-        	for (k = 0; k < trace_data->nsamp; k++ )
-            	PyList_SetItem(sample_list, k, Py_BuildValue("i", *(short_data + k)));
-	    }
+        if ((strcmp(trace_data->datatype, "s2") == 0) || (strcmp(trace_data->datatype, "i2") == 0)) {
+            for (k = 0; k < trace_data->nsamp; k++ )
+                PyList_SetItem(sample_list, k, Py_BuildValue("i", *(short_data + k)));
+        }
 
         else if ((strcmp(trace_data->datatype, "s4") == 0) || (strcmp(trace_data->datatype, "i4") == 0)) {
-        	for (k = 0; k < trace_data->nsamp; k++)
-            	PyList_SetItem(sample_list, k, Py_BuildValue("i", *(long_data + k)));
-	    }
-	
-	    PyDict_SetItem(trace, Py_BuildValue("s", "samples"), sample_list);
-	    PyList_SetItem(trace_list, i, trace);
-    }
+            for (k = 0; k < trace_data->nsamp; k++)
+                PyList_SetItem(sample_list, k, Py_BuildValue("i", *(long_data + k)));
+        }
     
+        PyDict_SetItem(trace, Py_BuildValue("s", "samples"), sample_list);
+        PyList_Append(trace_list, trace);
+        inserted++;
+    }
     free(raw_data);
     return trace_list;
 }

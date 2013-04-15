@@ -27,4 +27,4 @@
 // max_leng: Maximum length of the datatype being written
 // raw_data(out): Raw data of what was read from the ring
 // Returns: Number of bytes read from the ring
-char** read_ring(char ** params, int max_lenth, int max_items, int * nread);
+char** read_ring(char ** params, int max_lenth, int * nread);

@@ -22,7 +22,7 @@
 
 #include "ringreader.h"
 
-char** read_ring(char ** params, int max_lenth, int max_items, int * nread)
+char** read_ring(char ** params, int max_lenth, int * nread)
 {
     long RingKey;
     SHM_INFO region;
@@ -83,7 +83,7 @@ char** read_ring(char ** params, int max_lenth, int max_items, int * nread)
     int k;
     int j;
     while(1) {
-        if ((tport_getflag(&region) == TERMINATE) || (max_items > 0 && i >= max_items))
+        if (tport_getflag(&region) == TERMINATE)
             break;
 
         rc = tport_copyfrom(&region, getlogo, 1, &logo, &gotsize, (char *) &msg, max_lenth, &sequence_number);
